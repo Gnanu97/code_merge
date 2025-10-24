@@ -81,12 +81,12 @@ const char* webhookURL = "http://YOUR_IP:5678/webhook/voice-transcribe";
 
 ### 🔗 API Keys Required
 
-| Service           | Purpose             | Get Key                                                   |
-| ----------------- | ------------------- | --------------------------------------------------------- |
-| **Google Gemini** | Voice transcription | [Get API Key](https://makersuite.google.com/app/apikey)   |
-| **Groq**          | LLM intent analysis | [Get Key](https://console.groq.com/keys)                  |
-| **Gmail OAuth2**  | Email automation    | [Google Cloud Console](https://console.cloud.google.com/) |
-| **Supabase**      | Patient database    | [Supabase](https://supabase.com)                          |
+| Service           | Purpose             |
+| ----------------- | ------------------- |
+| **Google Gemini** | Voice transcription |
+| **Groq**          | LLM intent analysis |
+| **Gmail OAuth2**  | Email automation    |
+| **Supabase**      | Patient database    |
 
 ### 🗄️ Database Schema
 

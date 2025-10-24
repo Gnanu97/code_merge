@@ -1,11 +1,13 @@
-You're right, let me create a cleaner, more visually appealing README with better formatting:[1][2]
+Here’s your **properly formatted and polished `README.md`** — cleaned up, standardized for Markdown rendering (e.g., on GitHub), and visually enhanced while preserving all emojis, tables, and code sections:
 
-```markdown
+---
+
+````markdown
 # 🎙️ Voice-Controlled Healthcare Assistant
 
 > **AI-powered voice automation for patient management and email workflows**
 
-Voice-activated patient database queries and automated email system using ESP32-S3, n8n, and AI transcription.
+Voice-activated patient database queries and automated email system using **ESP32-S3**, **n8n**, and **AI transcription**.
 
 ---
 
@@ -13,27 +15,27 @@ Voice-activated patient database queries and automated email system using ESP32-
 
 Press a button, speak naturally, and let AI handle the rest:
 
-- 🎤 **Voice Recognition** - Google Gemini AI transcription
-- 🔍 **Smart Search** - Natural language patient database queries  
-- 📧 **Auto Emails** - Batch email sending via Gmail
-- 🤖 **Intent Detection** - Groq LLM classifies commands automatically
+- 🎤 **Voice Recognition** — Google Gemini AI transcription  
+- 🔍 **Smart Search** — Natural language patient database queries  
+- 📧 **Auto Emails** — Batch email sending via Gmail  
+- 🤖 **Intent Detection** — Groq LLM classifies commands automatically  
 
 ---
 
 ## 💡 Example Commands
 
-```
+```bash
 🗣️ "Find all thyroid patients"
-🗣️ "Send appointment reminder to overdue patients"  
+🗣️ "Send appointment reminder to overdue patients"
 🗣️ "List heart disease patients"
 🗣️ "Email diabetes patients about their checkup"
-```
+````
 
 ---
 
 ## 🏗️ Architecture
 
-```
+```text
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │   ESP32-S3   │────▶│  n8n Webhook │────▶│ Google Gemini│
 │  + I2S Mic   │     │              │     │ Transcription│
@@ -50,15 +52,16 @@ Press a button, speak naturally, and let AI handle the rest:
 
 ## 🔧 Hardware Components
 
-| Component | Pin | Purpose |
-|-----------|-----|---------|
-| **ESP32-S3** | - | Main microcontroller |
-| **I2S Microphone** | GPIO 5/4/6 | Audio recording |
-| **SD Card Module** | GPIO 10/11/12/13 | Local storage |
-| **Push Button** | GPIO 7 | Recording trigger |
+| Component          | Pin              | Purpose              |
+| ------------------ | ---------------- | -------------------- |
+| **ESP32-S3**       | -                | Main microcontroller |
+| **I2S Microphone** | GPIO 5/4/6       | Audio recording      |
+| **SD Card Module** | GPIO 10/11/12/13 | Local storage        |
+| **Push Button**    | GPIO 7           | Recording trigger    |
 
 ### Wiring
-```
+
+```text
 ESP32-S3          Component
 --------          ---------
 GPIO 7     ───►   Push Button
@@ -71,23 +74,27 @@ GPIO 10-13 ───►   SD Card (CS/MOSI/SCK/MISO)
 ## ⚙️ Configuration
 
 ### 📝 Arduino Setup
-Edit `n8n_automation_codemerge.ino`:
-```
+
+Edit **`n8n_automation_codemerge.ino`**:
+
+```cpp
 const char* ssid = "YOUR_WIFI_SSID";
 const char* password = "YOUR_PASSWORD";
 const char* webhookURL = "http://YOUR_IP:5678/webhook/voice-transcribe";
 ```
 
 ### 🔗 API Keys Required
-| Service | Purpose | Get Key |
-|---------|---------|---------|
-| **Google Gemini** | Voice transcription | [makersuite.google.com](https://makersuite.google.com/app/apikey) |
-| **Groq** | LLM intent analysis | [console.groq.com/keys](https://console.groq.com/keys) |
-| **Gmail OAuth2** | Email automation | Google Cloud Console |
-| **Supabase** | Patient database | [supabase.com](https://supabase.com) |
+
+| Service           | Purpose             | Get Key                                                   |
+| ----------------- | ------------------- | --------------------------------------------------------- |
+| **Google Gemini** | Voice transcription | [Get API Key](https://makersuite.google.com/app/apikey)   |
+| **Groq**          | LLM intent analysis | [Get Key](https://console.groq.com/keys)                  |
+| **Gmail OAuth2**  | Email automation    | [Google Cloud Console](https://console.cloud.google.com/) |
+| **Supabase**      | Patient database    | [Supabase](https://supabase.com)                          |
 
 ### 🗄️ Database Schema
-```
+
+```sql
 CREATE TABLE code_merge (
   id SERIAL PRIMARY KEY,
   name VARCHAR(255),
@@ -102,18 +109,18 @@ CREATE TABLE code_merge (
 
 ## 🎯 How It Works
 
-| Step | Action |
-|------|--------|
-| **1** | Press button → Records 8 seconds |
-| **2** | Saves WAV to SD card |
-| **3** | Uploads to n8n webhook via HTTP POST |
-| **4** | Google Gemini transcribes speech |
-| **5** | Groq LLM classifies intent (email or query) |
-| **6** | Executes: Supabase search OR Gmail send |
+| Step | Action                                      |
+| ---- | ------------------------------------------- |
+| 1    | Press button → Records 8 seconds            |
+| 2    | Saves WAV to SD card                        |
+| 3    | Uploads to n8n webhook via HTTP POST        |
+| 4    | Google Gemini transcribes speech            |
+| 5    | Groq LLM classifies intent (email or query) |
+| 6    | Executes: Supabase search OR Gmail send     |
 
-### n8n Workflow Path
+### 🧩 n8n Workflow Path
 
-```
+```text
 Webhook → Gemini → Groq Intent Classifier
                          │
                     ┌────┴────┐
@@ -133,7 +140,7 @@ Webhook → Gemini → Groq Intent Classifier
 
 ## 📊 Technical Specifications
 
-```
+```text
 Audio Format:    WAV (16kHz, 16-bit, Mono)
 Recording Time:  8 seconds max
 Storage:         SD Card (FAT32)
@@ -148,15 +155,17 @@ Database:        Supabase with vector search
 ## 🎤 Voice Command Categories
 
 ### 🔍 Database Queries
-```
+
+```bash
 ✓ "Find thyroid patients"
-✓ "Show overdue appointments"  
+✓ "Show overdue appointments"
 ✓ "List all diabetes patients"
 ✓ "Get heart disease patients"
 ```
 
 ### 📧 Email Commands
-```
+
+```bash
 ✓ "Email all heart patients about checkup"
 ✓ "Send reminder to overdue patients"
 ✓ "Message jane@example.com about results"
@@ -168,18 +177,18 @@ Database:        Supabase with vector search
 
 ⚠️ **This system handles Protected Health Information (PHI)**
 
-- ✅ Use HTTPS for n8n webhook
-- ✅ Enable webhook authentication
-- ✅ Encrypt SD card storage
-- ✅ Implement HIPAA compliance measures
-- ✅ Use WPA3 WiFi encryption
-- ✅ Enable Supabase Row Level Security
+* ✅ Use HTTPS for n8n webhook
+* ✅ Enable webhook authentication
+* ✅ Encrypt SD card storage
+* ✅ Implement HIPAA compliance measures
+* ✅ Use WPA3 WiFi encryption
+* ✅ Enable Supabase Row Level Security
 
 ---
 
 ## 📦 Project Files
 
-```
+```text
 📁 Project Root
 ├── 📄 n8n_automation_codemerge.ino    # ESP32 firmware
 ├── 📄 n8n-automation.json              # Workflow automation
@@ -190,29 +199,31 @@ Database:        Supabase with vector search
 
 ## ✨ Key Features
 
-| Feature | Description |
-|---------|-------------|
-| 🎤 **Voice Control** | Hands-free operation |
-| 🧠 **AI-Powered** | Gemini + Groq intelligence |
-| 🔍 **Semantic Search** | Vector database queries |
-| 📧 **Batch Emails** | Multiple patient messaging |
-| 💾 **Local Backup** | SD card audio archive |
-| 🌐 **Wireless** | WiFi data transmission |
-| 🧩 **Context Memory** | Conversation history |
+| Feature                | Description                |
+| ---------------------- | -------------------------- |
+| 🎤 **Voice Control**   | Hands-free operation       |
+| 🧠 **AI-Powered**      | Gemini + Groq intelligence |
+| 🔍 **Semantic Search** | Vector database queries    |
+| 📧 **Batch Emails**    | Multiple patient messaging |
+| 💾 **Local Backup**    | SD card audio archive      |
+| 🌐 **Wireless**        | WiFi data transmission     |
+| 🧩 **Context Memory**  | Conversation history       |
 
 ---
 
 ## 🛠️ Important Settings
 
-**Arduino Constants:**
-```
+### Arduino Constants
+
+```cpp
 SAMPLE_RATE 16000       // Audio quality
 RECORD_TIME_MS 8000     // Recording duration
 BUTTON_PIN 7            // Trigger pin
 ```
 
-**n8n Configuration:**
-```
+### n8n Configuration
+
+```text
 Gemini Model: gemini-1.5-flash
 Groq Model: openai/gpt-oss-120b
 Memory: 10 message context window
@@ -220,14 +231,13 @@ Memory: 10 message context window
 
 ---
 
-<div align="center">
+### 🏥 Built for Healthcare Automation
 
-**Built for Healthcare Automation**
+**ESP32-S3 × n8n × AI**
 
-ESP32-S3 × n8n × AI
-
-[View Code](n8n_automation_codemerge.ino) • [View Workflow](n8n-automation.json)
-
-</div>
 ```
 
+---
+
+Would you like me to add a short **installation section** (with Arduino + n8n setup commands and dependencies) at the top so it’s complete enough for GitHub publishing?
+```

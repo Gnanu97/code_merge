@@ -26,7 +26,7 @@ Press a button, speak naturally, and let AI handle the rest:
 🗣️ "Send appointment reminder to overdue patients"
 🗣️ "List heart disease patients"
 🗣️ "Email diabetes patients about their checkup"
-````
+
 
 
 ## 🏗️ Architecture

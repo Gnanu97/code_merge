@@ -114,6 +114,9 @@ CREATE TABLE code_merge (
 | 5    | Groq LLM classifies intent (email or query) |
 | 6    | Executes: Supabase search OR Gmail send     |
 
+<img width="1697" height="568" alt="image" src="https://github.com/user-attachments/assets/7de0bf33-49d9-4ed5-8030-5a8fc8d9b40e" />
+
+
 ### 🧩 n8n Workflow Path
 
 ```text

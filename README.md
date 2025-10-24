@@ -5,6 +5,7 @@
 Voice-activated patient database queries and automated email system using **ESP32-S3**, **n8n**, and **AI transcription**.
 
 ---
+<img width="354" height="468" alt="image" src="https://github.com/user-attachments/assets/c6b1b972-0688-4a0b-9f65-244194fa667e" />
 
 ## 🚀 Overview
 

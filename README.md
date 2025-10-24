@@ -156,18 +156,18 @@ Database:        Supabase with vector search
 ### 🔍 Database Queries
 
 ```bash
-✓ "Find thyroid patients"
-✓ "Show overdue appointments"
-✓ "List all diabetes patients"
-✓ "Get heart disease patients"
+ "Find thyroid patients"
+ "Show overdue appointments"
+ "List all diabetes patients"
+ "Get heart disease patients"
 ```
 
 ### 📧 Email Commands
 
 ```bash
-✓ "Email all heart patients about checkup"
-✓ "Send reminder to overdue patients"
-✓ "Message jane@example.com about results"
+"Email all heart patients about checkup"
+"Send reminder to overdue patients"
+"Message jane@example.com about results"
 ```
 
 ---

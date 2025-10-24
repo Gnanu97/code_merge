@@ -1,6 +1,3 @@
----
-
-````markdown
 # 🎙️ Voice-Controlled Healthcare Assistant
 
 > **AI-powered voice automation for patient management and email workflows**
@@ -22,14 +19,14 @@ Press a button, speak naturally, and let AI handle the rest:
 
 ## 💡 Example Commands
 
-```bash
+### 📋 Patient Database Queries
+
 🗣️ "Find all thyroid patients"
 🗣️ "Send appointment reminder to overdue patients"
 🗣️ "List heart disease patients"
 🗣️ "Email diabetes patients about their checkup"
 ````
 
----
 
 ## 🏗️ Architecture
 

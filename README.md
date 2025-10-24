@@ -227,13 +227,4 @@ Memory: 10 message context window
 
 ---
 
-### 🏥 Built for Healthcare Automation
 
-**ESP32-S3 × n8n × AI**
-
-```
-
----
-
-Would you like me to add a short **installation section** (with Arduino + n8n setup commands and dependencies) at the top so it’s complete enough for GitHub publishing?
-```

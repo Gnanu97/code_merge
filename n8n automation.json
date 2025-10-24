@@ -1,0 +1,620 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "128efe6c-3161-434c-95df-02bef4a57e66",
+              "name": "chatInput",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "c41739c7-55b0-42c3-a7bc-b3ac75a5e4c8",
+              "name": "data",
+              "value": "={{ $binary.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2480,
+        1040
+      ],
+      "id": "29f7f560-34f4-40d6-97ee-798f305053a3",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-1.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-1.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2704,
+        1040
+      ],
+      "id": "4412e15b-cf23-4fb7-a73b-d49b3d5b347a",
+      "name": "Transcribe a recording1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6njXZghTBBsjjebh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "voice-transcribe",
+        "options": {
+          "binaryPropertyName": "data",
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2928,
+        1040
+      ],
+      "id": "1599e9c1-e14b-4438-b746-1e8f672df5ba",
+      "name": "Webhook",
+      "webhookId": "18556fd2-79d0-49c4-afad-0568a8c05fcc",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a healthcare and communication assistant.\n\nVoice command: {{ $json.chatInput }}\n\nALWAYS respond with JSON format:\n\nFor EMAIL requests:\n{\n  \"function\": \"send_email\",\n  \"parameters\": {\n    \"to\": \"recipient\",\n    \"subject\": \"subject\",\n    \"message\": \"content\"\n  }\n}\n\nFor ANY HEALTHCARE queries (patients, conditions, appointments, medical data):\n{\n  \"function\": \"query_supabase\",\n  \"parameters\": {\n    \"query\": \"user's exact healthcare question\"\n  }\n}\n\nExamples of healthcare queries:\n- \"find thyroid patients\" → query_supabase\n- \"show me heart patients\" → query_supabase  \n- \"list overdue patients\" → query_supabase\n\nNEVER give generic responses. ALWAYS route to a specific function.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -2256,
+        1040
+      ],
+      "id": "c1cd683c-2071-4872-bd82-b232f10a9813",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-120b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -2320,
+        1264
+      ],
+      "id": "b23b53e6-a8c9-47d8-bb4a-3f6e20b5689f",
+      "name": "Groq Chat Model1",
+      "credentials": {
+        "groqApi": {
+          "id": "NNA35dKwbx8gW2f8",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let aiResponse = items[0].json.output || items[0].json.response;\ntry {\n  const response = JSON.parse(aiResponse.replace(/json|/g, '').trim());\n  \n  if (response.function === \"send_email\") {\n    return [{\n      json: {\n        function_name: \"send_email\",\n        parameters: response.parameters\n      }\n    }];\n  } else {\n    // Default to RAG system for healthcare queries\n    return [{\n      json: {\n        function_name: \"query_supabase\",\n        chatInput: response.parameters.query,\n        sessionId: \"voice-session\"\n      }\n    }];\n  }\n} catch (error) {\n  // Fallback to RAG\n  return [{\n    json: {\n      function_name: \"query_supabase\",\n      chatInput: aiResponse,\n      sessionId: \"voice-session\"\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        1040
+      ],
+      "id": "9d717963-d418-470a-b983-17484cd2f2ae",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "sendTo": "gg8889@srmist.edu.in",
+        "subject": "={{$json.subject}}",
+        "emailType": "text",
+        "message": "={{$json.message}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -704,
+        832
+      ],
+      "id": "5b81123c-47fb-484d-b5f5-887b86859165",
+      "name": "Send a message1",
+      "webhookId": "7d9cdf94-9e57-4cb4-b487-b2d434bc8f69",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Cq0DvzkFcpYWMyVJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5d03bac8-9c40-44ef-a6e0-7f15f22e0b8c",
+                    "leftValue": "={{$json.function_name}}",
+                    "rightValue": "=send_email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d411a57e-2d88-42dc-9f47-bea376f6863a",
+                    "leftValue": "={{$json.function_name}}",
+                    "rightValue": "query_supabase",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1680,
+        1040
+      ],
+      "id": "30693b57-d834-4800-ade3-30ab96818983",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process email function parameters\nconst functionData = items[0].json;\nconst params = functionData.parameters || {};\n\nreturn [{\n  json: {\n    to: params.to || \"gg8089@srmist.edu.in\",\n    subject: params.subject || \"Voice Command Email\",\n    message: params.message || functionData.original_command,\n    original_command: functionData.original_command,\n    function_executed: \"send_email\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1200,
+        832
+      ],
+      "id": "7f375647-8c6b-4159-bc79-14219d4d726d",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "code_merge"
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        1456
+      ],
+      "id": "3786e6a4-482e-4da5-979a-b1f3aa33480d",
+      "name": "Get many rows in Supabase1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "riv0Yll5duU3QvAC",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        1664
+      ],
+      "id": "60ddf035-0260-4439-aa61-fa13f796b9b8",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6njXZghTBBsjjebh",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Retrieve patient records using exact database queries. Use for specific searches by status, dates, names, or exact condition matches. Do not use complex filter syntax - use simple field matching.",
+        "tableName": {
+          "__rl": true,
+          "value": "code_merge",
+          "mode": "list",
+          "cachedResultName": "code_merge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -1072,
+        1456
+      ],
+      "id": "d66058db-7424-40fe-9b8e-b1e82393a7c3",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "riv0Yll5duU3QvAC",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "=conversation_history",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1328,
+        1456
+      ],
+      "id": "eeddd1fa-42c2-4422-b38a-df049cb6e511",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        1456
+      ],
+      "id": "9d517f43-bfa2-44ef-af47-c15e342e59b6",
+      "name": "Groq Chat Model3",
+      "credentials": {
+        "groqApi": {
+          "id": "NNA35dKwbx8gW2f8",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a healthcare assistant with access to patient database tools.\n\nUser Question: {{ $json.chatInput }}\n\nTOOL USAGE RULES:\n- For condition searches (heart, thyroid, kidney, diabetes, eye): Use \"Supabase Vector Store\"\n- For status queries (overdue, all patients, pending): Use \"Get many rows in Supabase\" with no additional parameters\n- For mixed queries: Use \"Supabase Vector Store\"\n\nExamples:\n- \"find thyroid patients\" → Use Vector Store for semantic search\n- \"show overdue patients\" → Use Get Many Rows with no parameters\n- \"list all patients\" → Use Get Many Rows with no parameters\n\nDo not use complex parameters. Keep tool calls simple.",
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1344,
+        1232
+      ],
+      "id": "cb0d47e0-21fa-452b-b38c-cfb10a56ff66",
+      "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple email extraction from AI Agent2 response\nconst aiResponse = items[0].json.output || items[0].json.response || items[0].json;\nconsole.log(\"AI Response received:\", JSON.stringify(aiResponse));\n\n// Handle different data formats from AI Agent2\nlet patientData = [];\n\n// Parse string response from Groq (most common format)\nif (typeof aiResponse === 'string') {\n  // Extract emails using pattern matching\n  const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})/g;\n  const emails = aiResponse.match(emailPattern) || [];\n  \n  // Extract patient names\n  const namePattern = /(?:Full Name|Name)[:\\s]([^|\\n\\r\\t]+?)(?:\\s\\||$|\\n|\\r)/g;\n  const names = [];\n  let match;\n  while ((match = namePattern.exec(aiResponse)) !== null) {\n    names.push(match[1].trim());\n  }\n  \n  // Extract conditions\n  const conditionPattern = /(?:Condition)[:\\s]([^|\\n\\r\\t]+?)(?:\\s\\||$|\\n|\\r)/g;\n  const conditions = [];\n  while ((match = conditionPattern.exec(aiResponse)) !== null) {\n    conditions.push(match[1].trim());\n  }\n  \n  // Combine extracted data\n  for (let i = 0; i < emails.length; i++) {\n    patientData.push({\n      email: emails[i],\n      name: names[i] || 'Patient ' + (i + 1), // Avoided template literal\n      condition: conditions[i] || 'General Checkup',\n      status: 'Overdue',\n      source: 'voice_query'\n    });\n  }\n}\n\n// Filter out invalid emails\nconst validPatients = patientData.filter(patient => \n  patient.email && \n  patient.email.includes('@') && \n  patient.email.includes('.')\n);\n\nconsole.log('Found ' + validPatients.length + ' patients with valid emails'); // Avoided template literal\n\n// Prepare email data for each patient\nconst emailQueue = validPatients.map((patient, index) => {\n  const subject = 'Health Appointment Reminder - ' + (patient.condition || 'Checkup'); // Avoided template literal\n  \n  const message = 'Dear ' + (patient.name || 'Patient') + ',\\n\\n' +\n    'We hope this message finds you well.\\n\\n' +\n    'This is a friendly reminder regarding your ' + (patient.condition || 'health checkup') + '.\\n\\n' +\n    'Your appointment is overdue. Please contact us to reschedule.\\n\\n' +\n    'Please call us to schedule or reschedule your appointment.\\n\\n' +\n    'Best regards,\\n' +\n    'Healthcare Team\\n\\n' +\n    '---\\n' +\n    'This is an automated message from your healthcare management system.';\n\n  return {\n    json: {\n      to: patient.email,\n      subject: subject,\n      message: message,\n      patient_name: patient.name,\n      patient_condition: patient.condition,\n      patient_status: patient.status,\n      batch_id: 'voice_batch_' + Date.now(), // Avoided template literal\n      email_index: index + 1,\n      total_emails: validPatients.length\n    }\n  };\n});\n\n// Return array for loop processing\nreturn emailQueue;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        1232
+      ],
+      "id": "f43823e0-c56d-4623-8c34-416cbb4d75f7",
+      "name": "Code7"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -256,
+        1168
+      ],
+      "id": "03b1f0ee-9ca6-4af4-b80c-71aebc2e5e49",
+      "name": "Send a message5",
+      "webhookId": "0e7c152e-a5e1-4d57-8baf-79e695d7a6bd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Cq0DvzkFcpYWMyVJ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -480,
+        1232
+      ],
+      "id": "89e7e300-90ad-4ee9-b455-2d18bd7924b6",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me1",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        1232
+      ],
+      "id": "edd557c6-9da6-4a1f-be00-0053f541c465"
+    }
+  ],
+  "connections": {
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows in Supabase1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent3",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent3": {
+      "main": [
+        [
+          {
+            "node": "Code7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message5": {
+      "main": [
+        [
+          {
+            "node": "Replace Me1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3e1fccc897fcceb0913e4cd3fb5c3d2f377362f658751febc5e5a2e755cc28a0"
+  }
+}
